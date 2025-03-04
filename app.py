@@ -33,7 +33,7 @@ def initialize_session_state():
 
 # Main Function
 def main():
-    st.set_page_config(page_title="Merged App", layout="wide")
+    st.set_page_config(page_title="Multi-Source Content Intelligence System", layout="wide")
     st.title("Multi-Source Content Intelligence System")
 
     # Initialize Session State

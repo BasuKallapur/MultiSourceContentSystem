@@ -1,0 +1,12 @@
+streamlit
+requests
+youtube-transcript-api
+langchain
+langchain_groq
+langchain_community
+sentence-transformers
+faiss-cpu
+unstructured
+PyPDF2
+python-docx
+pandas

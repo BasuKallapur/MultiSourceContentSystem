@@ -1,6 +1,11 @@
-langchain==0.1.0
-langchain-community==0.1.0
-requests==2.26.0
-streamlit==1.6.0
-youtube-transcript-api==0.4.1
+streamlit
 youtube-transcript-api
+requests
+langchain-groq
+langchain-community
+langchain
+faiss-cpu
+sentence-transformers
+unstructured
+PyPDF2
+docx2txt

@@ -9,3 +9,4 @@ sentence-transformers
 unstructured
 PyPDF2
 docx2txt
+YouTubeTranscriptApi

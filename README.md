@@ -24,7 +24,7 @@ The **Multi-Source Content Intelligence System** is a robust information retriev
 1. Clone the repository:
    ```sh
    git clone https://github.com/your-repo/multi-source-content-intelligence.git
-   cd multi-source-content-intelligence
+   cd MultiSourceContentSystemHiDevs
    ```
 
 2. Install dependencies:

@@ -4,6 +4,7 @@ from rag_qa import MultiFormatRAG
 import os
 import shutil
 import re
+import time
 
 def clear_temp_folder():
     if os.path.exists("temp_docs"):
@@ -28,6 +29,17 @@ def initialize_session_state():
         st.session_state.chat_history = []
     if 'summary_generated' not in st.session_state:
         st.session_state.summary_generated = False
+
+def typewriter_effect(text, speed=0.005):
+    """
+    Simulates a typewriter effect by displaying text character by character.
+    :param text: The text to display.
+    :param speed: The delay between characters (in seconds).
+    """
+    placeholder = st.empty()
+    for i in range(len(text) + 1):
+        placeholder.markdown(f"<div style='white-space: pre-wrap;'>{text[:i]}</div>", unsafe_allow_html=True)
+        time.sleep(speed)
 
 def main():
     st.set_page_config(page_title="Multi-Source Content Intelligence System", layout="wide")
@@ -114,13 +126,7 @@ def main():
                 final_summary = full_summary
                 with st.expander("Generated Summary", expanded=True):
                     for summary in final_summary:
-                        for line in summary.split("\n"):
-                            match = re.match(r"\[(\d{2}:\d{2})\] (.*)", line)
-                            if match:
-                                ts, text = match.groups()
-                                st.markdown(f"**[{ts}]** {text}")
-                            else:
-                                st.markdown(line)
+                        typewriter_effect(summary)  # Apply typewriter effect to each summary part
 
                 st.download_button("Download Summary", "\n".join(final_summary), file_name="summary.txt")
 

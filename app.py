@@ -52,9 +52,16 @@ def main():
                         if video_id:
                             st.session_state.video_id = video_id
                             transcript_text = extract_transcript_details(youtube_link)
-                            st.session_state.transcript_text = transcript_text
-                            st.session_state.summary_generated = False
-                            st.success("YouTube Summary initialized successfully!")
+                            if transcript_text and transcript_text[0][0] == "Error":
+                                if "blocked" in transcript_text[0][1].lower():
+                                    st.error("YouTube is blocking requests from this IP. Please try again later or use a VPN.")
+                                else:
+                                    st.error(transcript_text[0][1])  # Display the error message
+                                st.session_state.transcript_text = None
+                            else:
+                                st.session_state.transcript_text = transcript_text
+                                st.session_state.summary_generated = False
+                                st.success("YouTube Summary initialized successfully!")
                         else:
                             st.error("Invalid YouTube URL. Please check the link.")
                     except Exception as e:

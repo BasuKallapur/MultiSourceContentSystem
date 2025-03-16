@@ -28,24 +28,37 @@ def extract_transcript_details(youtube_video_url, target_language='en'):
                 return [("Error", "No suitable transcript found.")]
         except TranscriptsDisabled:
             return [("Error", "Transcripts are disabled for this video.")]
+        except Exception as e:
+            if "blocked" in str(e).lower():
+                return [("Error", "YouTube is blocking requests from this IP. Please try again later or use a VPN.")]
+            else:
+                return [("Error", str(e))]
         
         transcript = []
         last_timestamp = -30
         temp_text = []
 
         for item in transcript_data:
-            minutes = int(item["start"] // 60)
-            seconds = int(item["start"] % 60)
+            # Handle both manually provided and automatically generated transcripts
+            if isinstance(item, dict):  # Manually provided transcript
+                start_time = item["start"]
+                text = item["text"]
+            else:  # Automatically generated transcript
+                start_time = item.start
+                text = item.text
+
+            minutes = int(start_time // 60)
+            seconds = int(start_time % 60)
             timestamp = f"{minutes:02}:{seconds:02}"
 
-            if item["start"] - last_timestamp >= 30:
+            if start_time - last_timestamp >= 30:
                 if temp_text:
                     transcript.append((last_timestamp_text, " ".join(temp_text)))
                     temp_text = []
-                last_timestamp = item["start"]
+                last_timestamp = start_time
                 last_timestamp_text = timestamp
 
-            temp_text.append(item["text"])
+            temp_text.append(text)
 
         if temp_text:
             transcript.append((last_timestamp_text, " ".join(temp_text)))

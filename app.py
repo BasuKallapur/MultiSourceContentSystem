@@ -5,7 +5,6 @@ import os
 import shutil
 import re
 
-# Function to clear the temp_docs folder
 def clear_temp_folder():
     if os.path.exists("temp_docs"):
         for file in os.listdir("temp_docs"):
@@ -16,7 +15,6 @@ def clear_temp_folder():
             except Exception as e:
                 print(f"Error deleting file {file_path}: {e}")
 
-# Initialize Session State
 def initialize_session_state():
     if 'transcript_text' not in st.session_state:
         st.session_state.transcript_text = None
@@ -31,64 +29,51 @@ def initialize_session_state():
     if 'summary_generated' not in st.session_state:
         st.session_state.summary_generated = False
 
-# Main Function
 def main():
     st.set_page_config(page_title="Multi-Source Content Intelligence System", layout="wide")
     st.title("Multi-Source Content Intelligence System")
-
-    # Initialize Session State
     initialize_session_state()
 
-    # Sidebar Configuration
     with st.sidebar:
         st.title("Configuration")
         groq_api_key = st.text_input("Enter GROQ API Key:", type="password")
         youtube_link = st.text_input("Enter YouTube video URL")
         uploaded_files = st.file_uploader("Upload Training Documents", accept_multiple_files=True, type=['pdf', 'docx', 'txt', 'csv', 'html', 'md'])
 
-        # Button to initialize YouTube Summary
         if groq_api_key and youtube_link:
             if st.button("Initialize YouTube Summary"):
                 with st.spinner("Initializing YouTube Summary..."):
                     try:
-                        # Reset RAG System state
                         st.session_state.rag_system = None
                         st.session_state.qa_chain = None
                         st.session_state.chat_history = []
 
-                        # Initialize YouTube Summary
                         video_id = extract_video_id(youtube_link)
                         if video_id:
                             st.session_state.video_id = video_id
                             transcript_text = extract_transcript_details(youtube_link)
                             st.session_state.transcript_text = transcript_text
-                            st.session_state.summary_generated = False  # Reset summary state
+                            st.session_state.summary_generated = False
                             st.success("YouTube Summary initialized successfully!")
                         else:
                             st.error("Invalid YouTube URL. Please check the link.")
                     except Exception as e:
                         st.error(f"Error initializing YouTube Summary: {str(e)}")
 
-        # Button to initialize RAG System
         if groq_api_key and uploaded_files:
             if st.button("Initialize RAG System"):
                 with st.spinner("Initializing RAG System..."):
                     try:
-                        # Reset YouTube Summary state
                         st.session_state.transcript_text = None
                         st.session_state.video_id = None
-                        st.session_state.summary_generated = False  # Reset summary state
+                        st.session_state.summary_generated = False
 
-                        # Clear the temp_docs folder before saving new files
                         clear_temp_folder()
-
-                        # Save uploaded files to temp_docs folder
                         os.makedirs("temp_docs", exist_ok=True)
                         for file in uploaded_files:
                             with open(os.path.join("temp_docs", file.name), "wb") as f:
                                 f.write(file.getvalue())
 
-                        # Initialize RAG system
                         st.session_state.rag_system = MultiFormatRAG(groq_api_key)
                         documents = st.session_state.rag_system.load_documents("temp_docs")
                         vectorstore = st.session_state.rag_system.process_documents(documents)
@@ -97,9 +82,7 @@ def main():
                     except Exception as e:
                         st.error(f"Error initializing RAG System: {str(e)}")
 
-    # Main Area
     if groq_api_key:
-        # YouTube Video Summarizer
         if st.session_state.transcript_text:
             st.header("YouTube Video Summarizer")
             st.image(f"http://img.youtube.com/vi/{st.session_state.video_id}/0.jpg", width=250)
@@ -108,7 +91,7 @@ def main():
                     st.markdown(f"**[{ts}]** {text}")
 
             if st.button("Get Summary"):
-                st.session_state.summary_generated = True  # Mark summary as generated
+                st.session_state.summary_generated = True
                 st.markdown("### Summary")
                 full_summary = []
                 transcript_chunks = chunk_transcript(st.session_state.transcript_text, chunk_size=20)
@@ -122,7 +105,7 @@ def main():
                         full_summary.append(summary_part)
 
                 final_summary = full_summary
-                with st.expander("Generated Summary", expanded=True):  # Ensure the summary is always expanded
+                with st.expander("Generated Summary", expanded=True):
                     for summary in final_summary:
                         for line in summary.split("\n"):
                             match = re.match(r"\[(\d{2}:\d{2})\] (.*)", line)
@@ -134,7 +117,6 @@ def main():
 
                 st.download_button("Download Summary", "\n".join(final_summary), file_name="summary.txt")
 
-        # RAG-Based Q&A
         if st.session_state.qa_chain is not None:
             st.header("RAG-Based Q&A")
             user_input = st.chat_input("Ask a question:")

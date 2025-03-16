@@ -2,7 +2,7 @@ import os
 import re
 import time
 import requests
-from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 
 # Extract Video ID from YouTube URL
 def extract_video_id(url):
@@ -10,11 +10,25 @@ def extract_video_id(url):
     return match.group(1) if match else None
 
 # Fetch Transcript with Timestamps (Every 30s)
-def extract_transcript_details(youtube_video_url):
+def extract_transcript_details(youtube_video_url, target_language='en'):
     try:
         video_id = extract_video_id(youtube_video_url)
-        transcript_data = YouTubeTranscriptApi.get_transcript(video_id)
+        if not video_id:
+            return [("Error", "Invalid YouTube URL.")]
 
+        try:
+            transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=[target_language])
+        except NoTranscriptFound:
+            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            for transcript in transcript_list:
+                if transcript.is_generated:
+                    transcript_data = transcript.translate(target_language).fetch()
+                    break
+            else:
+                return [("Error", "No suitable transcript found.")]
+        except TranscriptsDisabled:
+            return [("Error", "Transcripts are disabled for this video.")]
+        
         transcript = []
         last_timestamp = -30
         temp_text = []

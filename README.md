@@ -2,7 +2,8 @@
 
 ## Overview
 The **Multi-Source Content Intelligence System** is a robust information retrieval system designed to process diverse content sources, including YouTube videos, web pages, and documents. It leverages **RAG (Retrieval-Augmented Generation) architecture**, **multi-modal processing**, and **content extraction techniques** to deliver precise content analysis and intelligent information synthesis.  
-[Visit the application here](https://multisourcecontentsystem-hidevs.up.railway.app)
+[Visit the application here](https://multisourcecontentsystem-hidevs.up.railway.app)   
+[YouTube Video link](https://youtu.be/IvUpg4D1PuY).
 
 
 ## Features

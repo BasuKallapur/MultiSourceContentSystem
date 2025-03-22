@@ -18,6 +18,7 @@ The **Multi-Source Content Intelligence System** is a robust information retriev
 - **FAISS** (Vector Database)
 - **YouTube Transcript API** (for extracting video transcripts)
 - **OpenAI/GROQ API** (for LLM-powered summarization and Q&A)
+- **LLaMA 3 (70B, 8192 context length)**
 
 ## Installation
 

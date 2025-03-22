@@ -17,7 +17,7 @@ The **Multi-Source Content Intelligence System** is a robust information retriev
 - **LangChain**
 - **FAISS** (Vector Database)
 - **YouTube Transcript API** (for extracting video transcripts)
-- **OpenAI/GROQ API** (for LLM-powered summarization and Q&A)
+- **GROQ API** (for LLM-powered summarization and Q&A)
 
 ## Installation
 

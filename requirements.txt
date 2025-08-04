@@ -1,5 +1,5 @@
 streamlit
-youtube_transcript_api==1.2.1
+youtube_transcript_api==1.0.0
 requests
 langchain-groq
 langchain-community

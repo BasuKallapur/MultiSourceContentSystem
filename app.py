@@ -1,6 +1,7 @@
 import streamlit as st
 from youtube_summarizer import extract_video_id, extract_transcript_details, call_groq_api, chunk_transcript
 from rag_qa import MultiFormatRAG
+from web_summarizer import summarize_webpage
 import os
 import time
 
@@ -35,6 +36,10 @@ def initialize_session_state():
         st.session_state.chat_history = []
     if 'summary_generated' not in st.session_state:
         st.session_state.summary_generated = False
+    if 'webpage_summary' not in st.session_state:
+        st.session_state.webpage_summary = None
+    if 'webpage_url' not in st.session_state:
+        st.session_state.webpage_url = None
 
 def typewriter_effect(text, speed=0.005):
     """
@@ -61,6 +66,7 @@ def main():
         groq_api_key = st.text_input("Enter GROQ API Key:", type="password")
         youtube_link = st.text_input("Enter YouTube video URL")
         uploaded_files = st.file_uploader("Upload Training Documents", accept_multiple_files=True, type=['pdf', 'docx', 'txt', 'csv', 'html', 'md'])
+        webpage_url = st.text_input("Enter Webpage URL to summarize")
 
         # Process YouTube video for transcript extraction
         if groq_api_key and youtube_link:
@@ -71,6 +77,8 @@ def main():
                         st.session_state.rag_system = None
                         st.session_state.qa_chain = None
                         st.session_state.chat_history = []
+                        st.session_state.webpage_summary = None
+                        st.session_state.webpage_url = None
 
                         video_id = extract_video_id(youtube_link)
                         if video_id:
@@ -100,6 +108,8 @@ def main():
                         st.session_state.transcript_text = None
                         st.session_state.video_id = None
                         st.session_state.summary_generated = False
+                        st.session_state.webpage_summary = None
+                        st.session_state.webpage_url = None
 
                         clear_temp_folder()
                         os.makedirs("temp_docs", exist_ok=True)
@@ -114,6 +124,29 @@ def main():
                         st.success("RAG System initialized successfully!")
                     except Exception as e:
                         st.error(f"Error initializing RAG System: {str(e)}")
+
+        # Process webpage for summarization
+        if groq_api_key and webpage_url:
+            if st.button("Summarize Webpage"):
+                with st.spinner("Processing webpage..."):
+                    try:
+                        # Reset previous session data
+                        st.session_state.transcript_text = None
+                        st.session_state.video_id = None
+                        st.session_state.summary_generated = False
+                        st.session_state.rag_system = None
+                        st.session_state.qa_chain = None
+                        st.session_state.chat_history = []
+
+                        summary_data, error = summarize_webpage(groq_api_key, webpage_url)
+                        if error:
+                            st.error(f"Error summarizing webpage: {error}")
+                        else:
+                            st.session_state.webpage_summary = summary_data
+                            st.session_state.webpage_url = webpage_url
+                            st.success("Webpage processed successfully!")
+                    except Exception as e:
+                        st.error(f"Error processing webpage: {str(e)}")
 
     # Display YouTube transcript and generate summary
     if groq_api_key and st.session_state.transcript_text:
@@ -143,6 +176,35 @@ def main():
                     typewriter_effect(summary)  # Apply typewriter effect to each summary part
 
             st.download_button("Download Summary", "\n".join(final_summary), file_name="summary.txt")
+
+    # Webpage Summarizer section
+    if groq_api_key and st.session_state.webpage_summary:
+        st.header("Webpage Summarizer")
+        
+        # Display webpage info
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.markdown("**📄 Webpage Info:**")
+            st.write(f"**Title:** {st.session_state.webpage_summary['title']}")
+            st.write(f"**URL:** {st.session_state.webpage_summary['url']}")
+            st.write(f"**Content Length:** {st.session_state.webpage_summary['content_length']:,} characters")
+            st.write(f"**Chunks Processed:** {st.session_state.webpage_summary['chunks_processed']}")
+        
+        with col2:
+            st.markdown("**🔗 Original URL:**")
+            st.write(f"[{st.session_state.webpage_summary['url']}]({st.session_state.webpage_summary['url']})")
+        
+        # Display summary
+        st.markdown("### 📝 Generated Summary")
+        with st.expander("View Summary", expanded=True):
+            typewriter_effect(st.session_state.webpage_summary['summary'])
+        
+        # Download option
+        st.download_button(
+            "Download Summary", 
+            f"Title: {st.session_state.webpage_summary['title']}\nURL: {st.session_state.webpage_summary['url']}\n\nSummary:\n{st.session_state.webpage_summary['summary']}", 
+            file_name="webpage_summary.txt"
+        )
 
     # RAG-Based Q&A section
     if groq_api_key and st.session_state.qa_chain is not None:

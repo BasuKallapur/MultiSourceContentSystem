@@ -9,3 +9,5 @@ sentence-transformers
 unstructured
 PyPDF2
 docx2txt
+beautifulsoup4
+typing-extensions

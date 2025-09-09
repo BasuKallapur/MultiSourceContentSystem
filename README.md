@@ -53,7 +53,6 @@ The **Multi-Source Content Intelligence System** is a robust information retriev
 - **Improve Search Ranking**: Enhance retrieval precision by refining vector search and ranking algorithms.
 - **Multi-Modal Embeddings**: Integrate multi-modal embeddings to improve response coherence across different content types.
 - **Optimized Processing Speed**: Improve efficiency for handling large document sets.
-- **Entity Recognition**: Implement Named Entity Recognition (NER) to structure extracted information better.
 
 ## Contributing
 Contributions are welcome! 🚀 If you'd like to improve the project, feel free to:

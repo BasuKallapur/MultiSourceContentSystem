@@ -5,7 +5,7 @@ The **Multi-Source Content Intelligence System** is a robust information retriev
 [YouTube Video link](https://youtu.be/IvUpg4D1PuY).
 
 ## Project Architecture
-<img width="688" height="654" alt="image" src="https://github.com/user-attachments/assets/e3bb8526-a10f-4964-8e53-91c7587209ec" />
+<img width="800" height="654" alt="image" src="https://github.com/user-attachments/assets/5dacdb03-9be2-4438-aa11-1c3b29275593" />
 
 ## Features
 - **YouTube Video Summarization**: Extracts and summarizes transcripts from YouTube videos.
